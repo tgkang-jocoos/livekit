@@ -42,7 +42,7 @@ func (d *DependencyDescriptor) IsOvershootOkay() bool {
 }
 
 func (d *DependencyDescriptor) Select(extPkt *buffer.ExtPacket, _layer int32) (result VideoLayerSelectorResult) {
-	// a packet is always relevant in the svc codec
+	// a packet is always relevant for the svc codec
 	result.IsRelevant = true
 
 	ddwdt := extPkt.DependencyDescriptor
