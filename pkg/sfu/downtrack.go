@@ -243,6 +243,11 @@ type DownTrack struct {
 
 	// update rtt
 	onRttUpdate func(dt *DownTrack, rtt uint32)
+
+	//TODO - remove this
+	prevSeq          uint16
+	prevOriginalSeqF uint16
+	prevOriginalSeqU uint16
 }
 
 // NewDownTrack returns a DownTrack.
@@ -571,6 +576,15 @@ func (d *DownTrack) WriteRTP(extPkt *buffer.ExtPacket, layer int32) error {
 		return nil
 	}
 
+	if d.kind == webrtc.RTPCodecTypeVideo {
+		// d.logger.Debugw("write rtp packet", "mungedSeq", tp.rtp.sequenceNumber, "originalSeq", extPkt.Packet.SequenceNumber, "mungedTs", tp.rtp.timestamp)
+		if d.prevOriginalSeqU != 0 && d.prevOriginalSeqU+1 != extPkt.Packet.SequenceNumber {
+			d.logger.Debugw("upstream rtp hole detected",
+				"prevOriginalSeq", d.prevOriginalSeqU, "currentOriginalSeq", extPkt.Packet.SequenceNumber)
+		}
+		d.prevOriginalSeqU = extPkt.Packet.SequenceNumber
+	}
+
 	tp, err := d.forwarder.GetTranslationParams(extPkt, layer)
 	if tp.shouldDrop {
 		if err != nil {
@@ -608,6 +622,16 @@ func (d *DownTrack) WriteRTP(extPkt *buffer.ExtPacket, layer int32) error {
 			PacketFactory.Put(pool)
 		}
 		return err
+	}
+	if d.kind == webrtc.RTPCodecTypeVideo {
+		d.logger.Debugw("write rtp packet", "mungedSeq", tp.rtp.sequenceNumber, "originalSeq", extPkt.Packet.SequenceNumber, "rtpmungerOffset", d.forwarder.rtpMunger.snOffset)
+		if d.prevSeq != 0 && d.prevSeq+1 != tp.rtp.sequenceNumber {
+			d.logger.Debugw("rtp hole detected", "prevSeq", d.prevSeq, "currentSeq", tp.rtp.sequenceNumber,
+				"prevOriginalSeq", d.prevOriginalSeqF, "currentOriginalSeq", extPkt.Packet.SequenceNumber,
+				"rtpmungerOffset", d.forwarder.rtpMunger.snOffset)
+		}
+		d.prevSeq = tp.rtp.sequenceNumber
+		d.prevOriginalSeqF = extPkt.Packet.SequenceNumber
 	}
 
 	d.pacer.Enqueue(pacer.Packet{

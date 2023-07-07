@@ -100,6 +100,9 @@ type Buffer struct {
 	paused              bool
 	frameRateCalculator [DefaultMaxLayerSpatial + 1]FrameRateCalculator
 	frameRateCalculated bool
+
+	// TODO-remove
+	prevOriginalSeq uint16
 }
 
 // NewBuffer constructs a new Buffer
@@ -415,6 +418,13 @@ func (b *Buffer) calc(pkt []byte, arrivalTime time.Time) {
 	if err != nil {
 		b.logger.Warnw("error unmarshaling RTP packet", err)
 		return
+	}
+
+	if strings.HasPrefix(b.mime, "video/") {
+		if b.prevOriginalSeq != 0 && b.prevOriginalSeq+1 != p.SequenceNumber {
+			b.logger.Debugw("upstream rtp hole", "prev", b.prevOriginalSeq, "current", p.SequenceNumber)
+		}
+		b.prevOriginalSeq = p.SequenceNumber
 	}
 
 	b.updateStreamState(&p, arrivalTime)

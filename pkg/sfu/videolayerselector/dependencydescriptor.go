@@ -42,16 +42,19 @@ func (d *DependencyDescriptor) IsOvershootOkay() bool {
 }
 
 func (d *DependencyDescriptor) Select(extPkt *buffer.ExtPacket, _layer int32) (result VideoLayerSelectorResult) {
+	// a packet is always relevant in the svc codec
+	result.IsRelevant = true
+
 	ddwdt := extPkt.DependencyDescriptor
 	if ddwdt == nil {
 		// packet doesn't have dependency descriptor
+		if len(extPkt.Packet.Payload) == 0 {
+			d.logger.Debugw("drop padding packet, no payload", "seq", extPkt.Packet.SequenceNumber)
+		}
 		return
 	}
 
 	dd := ddwdt.Descriptor
-
-	// a packet is relevant as long as it has DD extension
-	result.IsRelevant = true
 
 	extFrameNum := ddwdt.ExtFrameNum
 

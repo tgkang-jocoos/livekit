@@ -1599,8 +1599,10 @@ func (f *Forwarder) getTranslationParamsVideo(extPkt *buffer.ExtPacket, layer in
 	if !result.IsSelected {
 		tp.shouldDrop = true
 		if f.started && result.IsRelevant {
-			f.rtpMunger.UpdateAndGetSnTs(extPkt) // call to update highest incoming sequence number and other internal structures
-			f.rtpMunger.PacketDropped(extPkt)
+			if _, err := f.rtpMunger.UpdateAndGetSnTs(extPkt); err == nil { // call to update highest incoming sequence number and other internal structures
+				f.rtpMunger.PacketDropped(extPkt)
+			}
+			f.logger.Debugw("dropping packet", "seq", extPkt.Packet.SequenceNumber, "mungerSnOffset", f.rtpMunger.snOffset, "mungerHighestSn", f.rtpMunger.highestIncomingSN)
 		}
 		return tp, nil
 	}
@@ -1630,6 +1632,7 @@ func (f *Forwarder) getTranslationParamsVideo(extPkt *buffer.ExtPacket, layer in
 		//
 		// To differentiate between the two cases, drop only when in DEFICIENT state.
 		//
+		f.logger.Debugw("dropping packet2", "seq", extPkt.Packet.SequenceNumber, "mungerSnOffset", f.rtpMunger.snOffset, "mungerHighestSn", f.rtpMunger.highestIncomingSN)
 		tp.shouldDrop = true
 		return tp, nil
 	}
@@ -1649,6 +1652,7 @@ func (f *Forwarder) getTranslationParamsVideo(extPkt *buffer.ExtPacket, layer in
 	if err != nil {
 		tp.rtp = nil
 		tp.shouldDrop = true
+		f.logger.Debugw("dropping packet3", "seq", extPkt.Packet.SequenceNumber, "mungerSnOffset", f.rtpMunger.snOffset, "mungerHighestSn", f.rtpMunger.highestIncomingSN)
 		if err == codecmunger.ErrFilteredVP8TemporalLayer || err == codecmunger.ErrOutOfOrderVP8PictureIdCacheMiss {
 			if err == codecmunger.ErrFilteredVP8TemporalLayer {
 				// filtered temporal layer, update sequence number offset to prevent holes

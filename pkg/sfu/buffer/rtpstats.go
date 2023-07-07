@@ -822,21 +822,21 @@ func (r *RTPStats) SetRtcpSenderReportData(srData *RTCPSenderReportData) {
 			"highestTime", r.highestTime.String(),
 		)
 	} else {
-		packetDriftResult, reportDriftResult := r.getDrift()
-		r.logger.Debugw(
-			"received sender report",
-			"ntp", srData.NTPTimestamp.Time().String(),
-			"rtp", srData.RTPTimestamp,
-			"arrival", srData.At.String(),
-			"ntpDiffSinceLast", ntpDiffSinceLast.Seconds(),
-			"rtpDiffSinceLast", int32(rtpDiffSinceLast),
-			"arrivalDiffSinceLast", arrivalDiffSinceLast.Seconds(),
-			"expectedTimeDiffSinceLast", expectedTimeDiffSinceLast,
-			"packetDrift", packetDriftResult.String(),
-			"reportDrift", reportDriftResult.String(),
-			"highestTS", r.highestTS,
-			"highestTime", r.highestTime.String(),
-		)
+		// packetDriftResult, reportDriftResult := r.getDrift()
+		// r.logger.Debugw(
+		// 	"received sender report",
+		// 	"ntp", srData.NTPTimestamp.Time().String(),
+		// 	"rtp", srData.RTPTimestamp,
+		// 	"arrival", srData.At.String(),
+		// 	"ntpDiffSinceLast", ntpDiffSinceLast.Seconds(),
+		// 	"rtpDiffSinceLast", int32(rtpDiffSinceLast),
+		// 	"arrivalDiffSinceLast", arrivalDiffSinceLast.Seconds(),
+		// 	"expectedTimeDiffSinceLast", expectedTimeDiffSinceLast,
+		// 	"packetDrift", packetDriftResult.String(),
+		// 	"reportDrift", reportDriftResult.String(),
+		// 	"highestTS", r.highestTS,
+		// 	"highestTime", r.highestTime.String(),
+		// )
 	}
 }
 
@@ -969,21 +969,21 @@ func (r *RTPStats) GetRtcpSenderReport(ssrc uint32, srFirst *RTCPSenderReportDat
 			"highestTime", r.highestTime.String(),
 		)
 	} else {
-		packetDriftResult, reportDriftResult := r.getDrift()
-		r.logger.Debugw(
-			"sending sender report",
-			"ntp", nowNTP.Time().String(),
-			"rtp", nowRTP,
-			"departure", now.String(),
-			"ntpDiffSinceLast", ntpDiffSinceLast.Seconds(),
-			"rtpDiffSinceLast", int32(rtpDiffSinceLast),
-			"departureDiffSinceLast", departureDiffSinceLast.Seconds(),
-			"expectedTimeDiffSinceLast", expectedTimeDiffSinceLast,
-			"packetDrift", packetDriftResult.String(),
-			"reportDrift", reportDriftResult.String(),
-			"highestTS", r.highestTS,
-			"highestTime", r.highestTime.String(),
-		)
+		// packetDriftResult, reportDriftResult := r.getDrift()
+		// r.logger.Debugw(
+		// 	"sending sender report",
+		// 	"ntp", nowNTP.Time().String(),
+		// 	"rtp", nowRTP,
+		// 	"departure", now.String(),
+		// 	"ntpDiffSinceLast", ntpDiffSinceLast.Seconds(),
+		// 	"rtpDiffSinceLast", int32(rtpDiffSinceLast),
+		// 	"departureDiffSinceLast", departureDiffSinceLast.Seconds(),
+		// 	"expectedTimeDiffSinceLast", expectedTimeDiffSinceLast,
+		// 	"packetDrift", packetDriftResult.String(),
+		// 	"reportDrift", reportDriftResult.String(),
+		// 	"highestTS", r.highestTS,
+		// 	"highestTime", r.highestTime.String(),
+		// )
 	}
 
 	return &rtcp.SenderReport{
